@@ -1,138 +1,258 @@
-<div class="fashion-slug-page">
-  <!-- Editorial Header -->
-  <header class="slug-masthead">
-    <div class="masthead-pre">
-      <span class="edition-tag">SEO ROUTING &bull; SLUG ARCHITECTURE SYSTEM</span>
+<div class="magazine-wrapper">
+  <!-- Top Luxury Bar -->
+  <header class="vogue-header">
+    <div class="vogue-top">
+      <span class="edition-tag">HAUTE COUTURE & READY-TO-WEAR &bull; SLUG FASHION ARCHIVE</span>
+      <div class="vogue-brand">THE SLUG FASHION ARCHIVE</div>
+      <div class="top-actions">
+        <button (click)="openCreateModal()" class="btn-editorial-new">
+          <span>+</span> CREATE FASHION
+        </button>
+      </div>
     </div>
-    <h1 class="masthead-title">SLUG FASHION COLLECTIONS</h1>
-    <p class="masthead-sub">
-      Quản lý danh sách thời trang với cột <strong>IdF số nguyên duy nhất</strong>. 
-      Tự động khởi tạo và phân tích <strong>Slug SEO</strong> (<code>ten-san-pham-p&#123;IdF&#125;</code>) 
-      để điều hướng xem chi tiết tối ưu hóa công cụ tìm kiếm.
-    </p>
+
+    <!-- Editorial Navigation / Filter Bar -->
+    <nav class="editorial-nav">
+      <div class="nav-filters">
+        <button 
+          (click)="filterByStyle('ALL')" 
+          [class.active]="selectedStyle() === 'ALL'" 
+          class="nav-tab">
+          ALL COLLECTIONS
+        </button>
+        @for (st of stylesList(); track st) {
+          <button 
+            (click)="filterByStyle(st)" 
+            [class.active]="selectedStyle() === st" 
+            class="nav-tab">
+            {{ st }}
+          </button>
+        }
+      </div>
+
+      <!-- Quick Search Input -->
+      <div class="editorial-search">
+        <input 
+          type="text" 
+          placeholder="SEARCH ARCHIVE OR SLUG..." 
+          [value]="searchKeyword()"
+          (input)="searchKeyword.set($any($event.target).value)" 
+          class="search-input" />
+      </div>
+    </nav>
   </header>
 
-  <!-- Notification -->
+  <!-- Error / Loading notifications -->
   @if (errMessage()) {
-    <div class="alert alert-danger">
-      <span>⚠ {{ errMessage() }}</span>
+    <div class="editorial-alert">
+      <span>{{ errMessage() }}</span>
     </div>
   }
 
-  <!-- Filter & Search Bar -->
-  <div class="toolbar-card">
-    <div class="toolbar-left">
-      <label for="styleSelect"><strong>LỌC THEO PHONG CÁCH:</strong></label>
-      <select 
-        id="styleSelect" 
-        [value]="selectedStyle()" 
-        (change)="selectedStyle.set($any($event.target).value)" 
-        class="form-select">
-        <option value="ALL">-- TẤT CẢ PHONG CÁCH (ALL) --</option>
-        @for (st of styles(); track st) {
-          <option [value]="st">{{ st }}</option>
-        }
-      </select>
-    </div>
+  <!-- DETAIL MODAL / EDITORIAL SPOTLIGHT (Render chuẩn WYSIWYG) -->
+  @if (activeFashion(); as af) {
+    <section class="spotlight-section">
+      <div class="spotlight-card">
+        <button class="spotlight-close" (click)="closeDetail()" title="Đóng">&times;</button>
+        <div class="spotlight-inner">
+          <div class="spotlight-media">
+            @if (af.fashion_image) {
+              <img [src]="af.getBase64String()" [alt]="af.fashion_subject" class="spotlight-img" />
+            } @else {
+              <div class="spotlight-no-img">NO THUMBNAIL</div>
+            }
+            <span class="spotlight-badge">{{ af.style }}</span>
+          </div>
+          <div class="spotlight-content">
+            <div class="spotlight-meta-header">
+              <span class="meta-label">FEATURED STORY &bull; {{ af.created_at | date:'MMMM dd, yyyy' }}</span>
+              <span class="spotlight-idf">IdF #{{ af.IdF }}</span>
+            </div>
+            
+            <h1 class="spotlight-title">{{ af.fashion_subject }}</h1>
+            
+            <!-- Clean SEO Slug URL link -->
+            <div class="spotlight-slug-bar">
+              <span class="slug-tag-label">SEO SLUG:</span>
+              <a (click)="viewDetailSlug(af)" class="spotlight-slug-link" title="Xem trang riêng theo Slug">
+                /fashion-slug/{{ af.getSlug() }} &rarr;
+              </a>
+            </div>
 
-    <div class="toolbar-right">
-      <input 
-        type="text" 
-        placeholder="TÌM THEO TÊN, STYLE, SLUG HOẶC IDF..." 
-        [value]="searchTerm()" 
-        (input)="searchTerm.set($any($event.target).value)" 
-        class="search-input" />
-      <span class="count-badge">
-        {{ filteredFashions().length }} SẢN PHẨM
-      </span>
-    </div>
-  </div>
+            <div class="spotlight-divider"></div>
+            
+            <!-- Render WYSIWYG HTML Content -->
+            <div class="spotlight-body wysiwyg-rendered" [innerHTML]="af.fashion_detail"></div>
 
-  <!-- Main Fashion Slug Table -->
-  <div class="table-container">
-    @if (isLoading()) {
-      <div class="loading-box">
-        <div class="spinner"></div>
-        <p>ĐANG TẢI DỮ LIỆU FASHION SLUG...</p>
+            <div class="spotlight-actions">
+              <button (click)="viewDetailSlug(af)" class="btn-spotlight-view">
+                XEM TRANG SLUG RIÊNG
+              </button>
+              <button (click)="openEditModal(af, $event)" class="btn-spotlight-edit">
+                CHỈNH SỬA
+              </button>
+              <button (click)="deleteFashion(af, $event)" class="btn-spotlight-del">
+                XÓA
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    } @else if (filteredFashions().length === 0) {
-      <div class="empty-box">
-        <p>KHÔNG TÌM THẤY SẢN PHẨM PHÙ HỢP VỚI BỘ LỌC HIỆN TẠI.</p>
+    </section>
+  }
+
+  <!-- MAIN MAGAZINE CONTENT: GROUPED BY STYLE -->
+  <main class="magazine-main">
+    @if (isLoading()) {
+      <div class="editorial-loading">
+        <div class="editorial-spinner"></div>
+        <p>CURATING LATEST COLLECTIONS...</p>
+      </div>
+    } @else if (groupedFashions().length === 0) {
+      <div class="editorial-empty">
+        <p>NO STORIES FOUND IN THIS CATEGORY.</p>
+        <button (click)="openCreateModal()" class="btn-editorial-new">+ ADD FIRST FASHION</button>
       </div>
     } @else {
-      <div class="table-responsive">
-        <table class="editorial-table">
-          <thead>
-            <tr>
-              <th style="width: 80px; text-align: center;">CỘT IDF</th>
-              <th style="width: 90px; text-align: center;">THUMBNAIL</th>
-              <th>TIÊU ĐỀ FASHION (SUBJECT)</th>
-              <th style="width: 140px;">STYLE</th>
-              <th>SLUG ĐƯỢC TẠO (SEO URL)</th>
-              <th style="width: 120px;">NGÀY TẠO</th>
-              <th style="width: 220px; text-align: center;">CHI TIẾT ROUTING</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (f of filteredFashions(); track f._id) {
-              <tr>
-                <!-- Cột IdF kiểu số không trùng nhau -->
-                <td style="text-align: center;">
-                  <span class="idf-chip">#{{ f.IdF }}</span>
-                </td>
+      @for (group of groupedFashions(); track group.styleName) {
+        <section class="style-group-section">
+          <!-- Style Heading -->
+          <div class="group-header">
+            <h2 class="group-title">{{ group.styleName }}</h2>
+            <div class="group-line"></div>
+            <span class="group-count">{{ group.items.length }} STORIES</span>
+          </div>
 
-                <!-- Thumbnail -->
-                <td style="text-align: center;">
-                  @if (f.fashion_image) {
-                    <img [src]="f.getBase64String()" [alt]="f.fashion_subject" class="table-thumb" />
+          <!-- Fashion Grid Cards -->
+          <div class="fashion-grid">
+            @for (item of group.items; track item._id) {
+              <article class="fashion-card" (click)="openDetail(item)">
+                <!-- Image Container with Hover Action -->
+                <div class="card-thumb-wrap">
+                  @if (item.fashion_image) {
+                    <img [src]="item.getBase64String()" [alt]="item.fashion_subject" class="card-thumb" />
                   } @else {
-                    <div class="no-thumb">NO IMAGE</div>
+                    <div class="card-no-thumb">FASHION IMAGE</div>
                   }
-                </td>
-
-                <!-- Tiêu đề -->
-                <td class="col-subject">
-                  <strong class="subject-title">{{ f.fashion_subject }}</strong>
-                  <div class="object-id-sub">MongoDB _id: {{ f._id }}</div>
-                </td>
-
-                <!-- Style -->
-                <td>
-                  <span class="style-badge">{{ f.style }}</span>
-                </td>
-
-                <!-- Cột Slug được tạo -->
-                <td class="col-slug">
-                  <div class="slug-card">
-                    <span class="slug-prefix">/fashion-slug/</span>
-                    <strong class="slug-text">{{ f.getSlug() }}</strong>
+                  <div class="card-overlay">
+                    <span class="view-label">VIEW STORY &rarr;</span>
+                    <div class="card-quick-actions" (click)="$event.stopPropagation()">
+                      <button (click)="openEditModal(item, $event)" title="Sửa" class="quick-btn edit-btn">✎</button>
+                      <button (click)="deleteFashion(item, $event)" title="Xóa" class="quick-btn del-btn">&times;</button>
+                    </div>
                   </div>
-                  <a (click)="viewDetailSlug(f)" class="slug-link-action" title="Nhấp vào để phân tích và xem chi tiết theo Slug">
-                    🔗 Xem chi tiết theo Slug &rarr;
-                  </a>
-                </td>
+                </div>
 
-                <!-- Ngày tạo -->
-                <td class="col-date">
-                  {{ f.created_at | date:'dd/MM/yyyy' }}
-                </td>
-
-                <!-- Actions -->
-                <td style="text-align: center;">
-                  <div class="action-buttons">
-                    <button (click)="viewDetailSlug(f)" class="btn-action btn-slug" title="Điều hướng bằng Slug SEO">
-                      XEM THEO SLUG
-                    </button>
-                    <button (click)="viewDetailByIdF(f)" class="btn-action btn-idf" title="Điều hướng bằng IdF số">
-                      XEM IDF #{{ f.IdF }}
-                    </button>
+                <!-- Text metadata -->
+                <div class="card-meta">
+                  <div class="card-tags-row">
+                    <span class="card-idf-tag">#{{ item.IdF }}</span>
+                    <a (click)="viewDetailSlug(item, $event)" class="card-slug-link" title="Xem chi tiết theo Slug">
+                      /{{ item.getSlug() }}
+                    </a>
                   </div>
-                </td>
-              </tr>
+                  <h3 class="card-title">{{ item.fashion_subject }}</h3>
+                  <div class="card-excerpt" [innerHTML]="item.fashion_detail"></div>
+                  <span class="card-date">{{ item.created_at | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </article>
             }
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </section>
+      }
     }
-  </div>
+  </main>
+
+  <!-- MODAL: ADD / EDIT FASHION WITH WYSIWYG EDITOR -->
+  @if (showFormModal()) {
+    <div class="editorial-modal-backdrop" (click)="closeFormModal()">
+      <div class="editorial-modal" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ isEditMode() ? 'EDIT FASHION STORY' : 'PUBLISH NEW FASHION' }}</h3>
+          <button (click)="closeFormModal()" class="close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Style & Subject -->
+          <div class="form-row">
+            <div class="form-field">
+              <label>STYLE / COLLECTION:</label>
+              <input 
+                type="text" 
+                [(ngModel)]="editingFashion.style" 
+                list="slugModalStyleSuggestions" 
+                placeholder="e.g. CELEBRITY STYLE, STREET STYLE, TRENDS" 
+                class="input-dark" />
+              <datalist id="slugModalStyleSuggestions">
+                @for (s of stylesList(); track s) {
+                  <option [value]="s"></option>
+                }
+              </datalist>
+            </div>
+
+            <div class="form-field">
+              <label>STORY SUBJECT / TITLE:</label>
+              <input 
+                type="text" 
+                [(ngModel)]="editingFashion.fashion_subject" 
+                placeholder="Subject of fashion item..." 
+                class="input-dark" />
+            </div>
+          </div>
+
+          <!-- Image Upload with Base64 -->
+          <div class="form-field">
+            <label>THUMBNAIL IMAGE (UPLOAD):</label>
+            <div class="file-drop-zone">
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" id="slugModalUpload" class="hidden-file" />
+              <label for="slugModalUpload" class="file-label">
+                <span>CHOOSE AN IMAGE FILE (JPEG / PNG)</span>
+              </label>
+              @if (imagePreview) {
+                <div class="modal-preview-box">
+                  <img [src]="imagePreview" alt="Preview" class="modal-preview-img" />
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- WYSIWYG Editor Field -->
+          <div class="form-field">
+            <label>STORY DETAILS (WYSIWYG EDITOR):</label>
+            <div class="editor-frame">
+              <div class="editor-toolbar">
+                <button type="button" (click)="execCmd('bold')"><b>B</b></button>
+                <button type="button" (click)="execCmd('italic')"><i>I</i></button>
+                <button type="button" (click)="execCmd('underline')"><u>U</u></button>
+                <span class="sep">|</span>
+                <button type="button" (click)="execCmd('justifyLeft')">⇤</button>
+                <button type="button" (click)="execCmd('justifyCenter')">≡</button>
+                <button type="button" (click)="execCmd('justifyRight')">⇥</button>
+                <span class="sep">|</span>
+                <button type="button" (click)="execCmd('insertUnorderedList')">&bull; List</button>
+                <button type="button" (click)="execCmd('insertOrderedList')">1. List</button>
+                <span class="sep">|</span>
+                <button type="button" (click)="execCmd('formatBlock', '<h3>')">H3</button>
+                <button type="button" (click)="execCmd('formatBlock', '<p>')">P</button>
+              </div>
+              <div 
+                id="slug-wysiwyg-editor"
+                class="editor-editable" 
+                contenteditable="true" 
+                (input)="onDetailInput($event)"
+                placeholder="Write the editorial fashion description...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-foot">
+          <button (click)="saveFashion()" [disabled]="isSaving" class="btn-publish">
+            {{ isSaving ? 'SAVING...' : (isEditMode() ? 'SAVE CHANGES' : 'PUBLISH TO ARCHIVE') }}
+          </button>
+          <button (click)="closeFormModal()" class="btn-cancel">DISCARD</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
