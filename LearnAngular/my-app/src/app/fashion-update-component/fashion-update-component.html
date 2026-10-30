@@ -1,0 +1,130 @@
+<div class="form-container">
+  <div class="form-header">
+    <div class="nav-back">
+      <a routerLink="/fashion-list" class="btn-back">← Quay lại danh sách</a>
+    </div>
+    <h2>Chỉnh Sửa Sản Phẩm Fashion</h2>
+    <p class="subtitle">Cập nhật thông tin chi tiết và định dạng bài viết bằng WYSIWYG Editor</p>
+  </div>
+
+  @if (errMessage) {
+    <div class="alert alert-danger">
+      <span>⚠ {{ errMessage }}</span>
+    </div>
+  }
+
+  <div class="card form-card">
+    <div class="form-grid">
+      <!-- Fashion ID (Readonly) -->
+      <div class="form-group full-width">
+        <label><strong>Fashion ObjectId:</strong></label>
+        <div class="id-input-group">
+          <input 
+            type="text" 
+            [(ngModel)]="fashion._id" 
+            placeholder="Nhập ID Fashion hoặc được nạp tự động..." 
+            class="form-control" />
+          <button type="button" (click)="loadFashion(fashion._id)" class="btn btn-secondary">Nạp dữ liệu</button>
+        </div>
+      </div>
+
+      <!-- IdF (Số không trùng nhau) -->
+      <div class="form-group">
+        <label for="idfUpdate"><strong>Mã số Fashion (IdF):</strong></label>
+        <input 
+          type="number" 
+          id="idfUpdate" 
+          [(ngModel)]="fashion.IdF" 
+          class="form-control" />
+      </div>
+
+      <!-- Style -->
+      <div class="form-group">
+        <label for="styleUpdate"><strong>Phong cách (Style):</strong></label>
+        <input 
+          type="text" 
+          id="styleUpdate" 
+          list="styleUpdateList" 
+          [(ngModel)]="fashion.style" 
+          class="form-control" />
+        <datalist id="styleUpdateList">
+          @for (s of styles; track s) {
+            <option [value]="s"></option>
+          }
+        </datalist>
+      </div>
+
+      <!-- Subject -->
+      <div class="form-group">
+        <label for="subjectUpdate"><strong>Tiêu đề Fashion:</strong></label>
+        <input 
+          type="text" 
+          id="subjectUpdate" 
+          [(ngModel)]="fashion.fashion_subject" 
+          class="form-control" />
+      </div>
+
+      <!-- Thumbnail Image -->
+      <div class="form-group full-width">
+        <label><strong>Hình ảnh đại diện (Thumbnail):</strong></label>
+        <div class="upload-box">
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" id="fileUploadUpdate" class="file-input" />
+          <label for="fileUploadUpdate" class="upload-label">
+            <span class="upload-icon">📁</span>
+            <span>Thay đổi ảnh mới</span>
+          </label>
+          @if (imagePreview) {
+            <div class="preview-box">
+              <img [src]="imagePreview" alt="Preview Thumbnail" class="preview-img" />
+              <span class="preview-tag">Ảnh hiện tại</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- WYSIWYG Editor for Detail -->
+      <div class="form-group full-width">
+        <label><strong>Chi tiết Fashion (WYSIWYG HTML Editor):</strong></label>
+        <div class="wysiwyg-container">
+          <div class="wysiwyg-toolbar">
+            <button type="button" (click)="execCmd('bold')" title="In đậm"><b>B</b></button>
+            <button type="button" (click)="execCmd('italic')" title="In nghiêng"><i>I</i></button>
+            <button type="button" (click)="execCmd('underline')" title="Gạch chân"><u>U</u></button>
+            <span class="divider"></span>
+            <button type="button" (click)="execCmd('justifyLeft')" title="Căn trái">⇤</button>
+            <button type="button" (click)="execCmd('justifyCenter')" title="Căn giữa">≡</button>
+            <button type="button" (click)="execCmd('justifyRight')" title="Căn phải">⇥</button>
+            <span class="divider"></span>
+            <button type="button" (click)="execCmd('insertUnorderedList')" title="Danh sách">• List</button>
+            <button type="button" (click)="execCmd('insertOrderedList')" title="Số thứ tự">1. List</button>
+            <span class="divider"></span>
+            <button type="button" (click)="execCmd('formatBlock', '<h3>')">H3</button>
+            <button type="button" (click)="execCmd('formatBlock', '<p>')">P</button>
+          </div>
+          <div 
+            id="wysiwyg-update-editor"
+            class="wysiwyg-content" 
+            contenteditable="true" 
+            (input)="onDetailInput($event)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button 
+        type="button" 
+        (click)="putFashion()" 
+        [disabled]="isSubmitting" 
+        class="btn btn-warning btn-lg">
+        @if (isSubmitting) {
+          Đang cập nhật...
+        } @else {
+          ✔ Cập nhật & Quay lại danh sách
+        }
+      </button>
+      <a routerLink="/fashion-list" class="btn btn-secondary btn-lg">Hủy bỏ</a>
+    </div>
+  </div>
+</div>

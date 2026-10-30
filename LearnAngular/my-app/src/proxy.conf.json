@@ -1,0 +1,56 @@
+{
+  "/products": {
+    "target": "https://fakestoreapi.com",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/products/*": {
+    "target": "https://fakestoreapi.com",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/books": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/books/*": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/fashions": {
+    "target": "http://localhost:3002",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/fashions/*": {
+    "target": "http://localhost:3002",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/fashions/**": {
+    "target": "http://localhost:3002",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/user-login": {
+    "target": "http://localhost:3002",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/user-session": {
+    "target": "http://localhost:3002",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

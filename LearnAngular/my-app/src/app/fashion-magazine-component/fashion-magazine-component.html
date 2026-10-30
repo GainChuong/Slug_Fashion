@@ -1,0 +1,242 @@
+<div class="magazine-wrapper">
+  <!-- Top Luxury Bar -->
+  <header class="vogue-header">
+    <div class="vogue-top">
+      <span class="edition-tag">HAUTE COUTURE & READY-TO-WEAR &bull; 2026 SPECIAL ISSUE</span>
+      <div class="vogue-brand">THE FASHION ARCHIVE</div>
+      <div class="top-actions">
+        <button (click)="openCreateModal()" class="btn-editorial-new">
+          <span>+</span> CREATE FASHION
+        </button>
+      </div>
+    </div>
+
+    <!-- Editorial Navigation / Filter Bar -->
+    <nav class="editorial-nav">
+      <div class="nav-filters">
+        <button 
+          (click)="filterByStyle('ALL')" 
+          [class.active]="selectedStyle() === 'ALL'" 
+          class="nav-tab">
+          ALL COLLECTIONS
+        </button>
+        @for (st of stylesList(); track st) {
+          <button 
+            (click)="filterByStyle(st)" 
+            [class.active]="selectedStyle() === st" 
+            class="nav-tab">
+            {{ st }}
+          </button>
+        }
+      </div>
+
+      <!-- Quick Search Input -->
+      <div class="editorial-search">
+        <input 
+          type="text" 
+          placeholder="SEARCH ARCHIVE..." 
+          [value]="searchKeyword()"
+          (input)="searchKeyword.set($any($event.target).value)" 
+          class="search-input" />
+      </div>
+    </nav>
+  </header>
+
+  <!-- Error / Loading notifications -->
+  @if (errMessage()) {
+    <div class="editorial-alert">
+      <span>{{ errMessage() }}</span>
+    </div>
+  }
+
+  <!-- DETAIL MODAL / EDITORIAL SPOTLIGHT (Render chuẩn WYSIWYG) -->
+  @if (activeFashion(); as af) {
+    <section class="spotlight-section">
+      <div class="spotlight-card">
+        <button class="spotlight-close" (click)="closeDetail()" title="Đóng">&times;</button>
+        <div class="spotlight-inner">
+          <div class="spotlight-media">
+            @if (af.fashion_image) {
+              <img [src]="af.getBase64String()" [alt]="af.fashion_subject" class="spotlight-img" />
+            } @else {
+              <div class="spotlight-no-img">NO THUMBNAIL</div>
+            }
+            <span class="spotlight-badge">{{ af.style }}</span>
+          </div>
+          <div class="spotlight-content">
+            <span class="meta-label">FEATURED EDITORIAL &bull; {{ af.created_at | date:'MMMM dd, yyyy' }}</span>
+            <h1 class="spotlight-title">{{ af.fashion_subject }}</h1>
+            <div class="spotlight-divider"></div>
+            
+            <!-- Render WYSIWYG HTML Content -->
+            <div class="spotlight-body wysiwyg-rendered" [innerHTML]="af.fashion_detail"></div>
+
+            <div class="spotlight-actions">
+              <button (click)="openEditModal(af, $event)" class="btn-spotlight-edit">
+                EDIT THIS STORY
+              </button>
+              <button (click)="deleteFashion(af, $event)" class="btn-spotlight-del">
+                REMOVE
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- MAIN MAGAZINE CONTENT: GROUPED BY STYLE (Theo hình ảnh đề bài 58) -->
+  <main class="magazine-main">
+    @if (isLoading()) {
+      <div class="editorial-loading">
+        <div class="editorial-spinner"></div>
+        <p>CURATING LATEST COLLECTIONS...</p>
+      </div>
+    } @else if (groupedFashions().length === 0) {
+      <div class="editorial-empty">
+        <p>NO STORIES FOUND IN THIS CATEGORY.</p>
+        <button (click)="openCreateModal()" class="btn-editorial-new">+ ADD FIRST FASHION</button>
+      </div>
+    } @else {
+      @for (group of groupedFashions(); track group.styleName) {
+        <section class="style-group-section">
+          <!-- Style Heading -->
+          <div class="group-header">
+            <h2 class="group-title">{{ group.styleName }}</h2>
+            <div class="group-line"></div>
+            <span class="group-count">{{ group.items.length }} STORIES</span>
+          </div>
+
+          <!-- Fashion Grid Cards -->
+          <div class="fashion-grid">
+            @for (item of group.items; track item._id) {
+              <article class="fashion-card" (click)="openDetail(item)">
+                <!-- Image Container with Hover Action -->
+                <div class="card-thumb-wrap">
+                  @if (item.fashion_image) {
+                    <img [src]="item.getBase64String()" [alt]="item.fashion_subject" class="card-thumb" />
+                  } @else {
+                    <div class="card-no-thumb">FASHION IMAGE</div>
+                  }
+                  <div class="card-overlay">
+                    <span class="view-label">VIEW STORY &rarr;</span>
+                    <div class="card-quick-actions" (click)="$event.stopPropagation()">
+                      <button (click)="openEditModal(item, $event)" title="Sửa" class="quick-btn edit-btn">✎</button>
+                      <button (click)="deleteFashion(item, $event)" title="Xóa" class="quick-btn del-btn">&times;</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Text metadata -->
+                <div class="card-meta">
+                  <div class="card-tags-row">
+                    <span class="card-idf-tag">IdF: #{{ item.IdF }}</span>
+                    <a [routerLink]="['/fashion-detail', item.getSlug()]" (click)="$event.stopPropagation()" class="card-slug-link" title="Mở trang chi tiết theo Slug">
+                      /{{ item.getSlug() }}
+                    </a>
+                  </div>
+                  <h3 class="card-title">{{ item.fashion_subject }}</h3>
+                  <div class="card-excerpt" [innerHTML]="item.fashion_detail"></div>
+                  <span class="card-date">{{ item.created_at | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+      }
+    }
+  </main>
+
+  <!-- MODAL: ADD / EDIT FASHION WITH WYSIWYG EDITOR -->
+  @if (showFormModal()) {
+    <div class="editorial-modal-backdrop" (click)="closeFormModal()">
+      <div class="editorial-modal" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ isEditMode() ? 'EDIT FASHION STORY' : 'PUBLISH NEW FASHION' }}</h3>
+          <button (click)="closeFormModal()" class="close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Style & Subject -->
+          <div class="form-row">
+            <div class="form-field">
+              <label>STYLE / COLLECTION:</label>
+              <input 
+                type="text" 
+                [(ngModel)]="editingFashion.style" 
+                list="modalStyleSuggestions" 
+                placeholder="e.g. STREET STYLE, TRENDS, VINTAGE" 
+                class="input-dark" />
+              <datalist id="modalStyleSuggestions">
+                @for (s of stylesList(); track s) {
+                  <option [value]="s"></option>
+                }
+              </datalist>
+            </div>
+
+            <div class="form-field">
+              <label>STORY SUBJECT / TITLE:</label>
+              <input 
+                type="text" 
+                [(ngModel)]="editingFashion.fashion_subject" 
+                placeholder="Subject of fashion item..." 
+                class="input-dark" />
+            </div>
+          </div>
+
+          <!-- Image Upload with Base64 -->
+          <div class="form-field">
+            <label>THUMBNAIL IMAGE (UPLOAD):</label>
+            <div class="file-drop-zone">
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" id="modalUpload" class="hidden-file" />
+              <label for="modalUpload" class="file-label">
+                <span>CHOOSE AN IMAGE FILE (JPEG / PNG)</span>
+              </label>
+              @if (imagePreview) {
+                <div class="modal-preview-box">
+                  <img [src]="imagePreview" alt="Preview" class="modal-preview-img" />
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- WYSIWYG Editor Field -->
+          <div class="form-field">
+            <label>STORY DETAILS (WYSIWYG EDITOR):</label>
+            <div class="editor-frame">
+              <div class="editor-toolbar">
+                <button type="button" (click)="execCmd('bold')"><b>B</b></button>
+                <button type="button" (click)="execCmd('italic')"><i>I</i></button>
+                <button type="button" (click)="execCmd('underline')"><u>U</u></button>
+                <span class="sep">|</span>
+                <button type="button" (click)="execCmd('justifyLeft')">⇤</button>
+                <button type="button" (click)="execCmd('justifyCenter')">≡</button>
+                <button type="button" (click)="execCmd('justifyRight')">⇥</button>
+                <span class="sep">|</span>
+                <button type="button" (click)="execCmd('insertUnorderedList')">&bull; List</button>
+                <button type="button" (click)="execCmd('insertOrderedList')">1. List</button>
+                <span class="sep">|</span>
+                <button type="button" (click)="execCmd('formatBlock', '<h3>')">H3</button>
+                <button type="button" (click)="execCmd('formatBlock', '<p>')">P</button>
+              </div>
+              <div 
+                id="mag-wysiwyg-editor"
+                class="editor-editable" 
+                contenteditable="true" 
+                (input)="onDetailInput($event)"
+                placeholder="Write the editorial fashion description...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-foot">
+          <button (click)="saveFashion()" [disabled]="isSaving" class="btn-publish">
+            {{ isSaving ? 'SAVING...' : (isEditMode() ? 'SAVE CHANGES' : 'PUBLISH TO ARCHIVE') }}
+          </button>
+          <button (click)="closeFormModal()" class="btn-cancel">DISCARD</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

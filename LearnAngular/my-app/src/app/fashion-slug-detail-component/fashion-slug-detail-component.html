@@ -1,0 +1,128 @@
+<div class="slug-detail-page">
+  <!-- Header Bar -->
+  <header class="detail-masthead">
+    <div class="nav-links">
+      <a (click)="goBackToList()" class="btn-back">
+        &larr; QUAY LẠI DANH SÁCH SLUG FASHION
+      </a>
+      <span class="nav-dot">&bull;</span>
+      <a routerLink="/fashion-magazine" class="btn-back">
+        ★ XEM TRANG MAGAZINE
+      </a>
+    </div>
+    <h1 class="masthead-title">FASHION SLUG DETAIL & ANALYZER</h1>
+    <p class="masthead-sub">
+      Hệ thống tự động phân tích cấu trúc Slug URL (<code>ten-san-pham-p&#123;IdF&#125;</code>) 
+      để trích xuất chính xác mã định danh <strong>IdF</strong> và hiển thị đầy đủ thông tin thời trang tương ứng.
+    </p>
+  </header>
+
+  <!-- Interactive Slug Analyzer Tester -->
+  <section class="analyzer-box">
+    <label for="slugTestInput"><strong>NHẬP / KIỂM THỬ SLUG HOẶC IDF BẤT KỲ:</strong></label>
+    <div class="analyzer-input-group">
+      <input 
+        type="text" 
+        id="slugTestInput" 
+        [(ngModel)]="slugInput" 
+        placeholder="Ví dụ: victoria-beckham-just-wore-the-coat-p10 hoặc nhập IdF: 10..." 
+        class="input-slug" 
+        (keyup.enter)="onAnalyzeClick()" />
+      <button (click)="onAnalyzeClick()" class="btn-analyze">
+        PHÂN TÍCH & TRÍCH XUẤT
+      </button>
+    </div>
+  </section>
+
+  <!-- Slug Inspector Card: Minh họa trực quan logic phân tích -->
+  @if (analysis().rawSlug) {
+    <section class="inspector-card">
+      <div class="inspector-head">
+        <span class="inspector-badge">SLUG INSPECTION REPORT</span>
+        <span class="status-indicator" [class.success]="analysis().status === 'SUCCESS'" [class.failed]="analysis().status === 'FAILED'">
+          {{ analysis().status }}
+        </span>
+      </div>
+      <div class="inspector-grid">
+        <div class="inspector-item">
+          <span class="item-label">CHUỖI SLUG GỐC:</span>
+          <code class="item-value">{{ analysis().rawSlug }}</code>
+        </div>
+        <div class="inspector-item">
+          <span class="item-label">LOẠI ĐỊNH DANH (TYPE):</span>
+          <strong class="item-value type-highlight">{{ analysis().identityType }}</strong>
+        </div>
+        <div class="inspector-item">
+          <span class="item-label">MÃ IDF ĐƯỢC TÁCH:</span>
+          <strong class="item-value idf-highlight">
+            {{ analysis().extractedIdF !== null ? '#' + analysis().extractedIdF : 'KHÔNG TÁCH ĐƯỢC' }}
+          </strong>
+        </div>
+        <div class="inspector-item">
+          <span class="item-label">KEY TRUY VẤN MONGODB:</span>
+          <code class="item-value">{{ analysis().queryKeyUsed }}</code>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Error Alert -->
+  @if (errMessage()) {
+    <div class="alert alert-danger">
+      <span>⚠ {{ errMessage() }}</span>
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>HỆ THỐNG ĐANG PHÂN TÍCH SLUG VÀ NẠP DỮ LIỆU TỪ MONGODB...</p>
+    </div>
+  }
+
+  <!-- Fashion Detail Article (Chuẩn phong cách Vogue Magazine) -->
+  @if (fashion() != null) {
+    <article class="fashion-article">
+      <!-- Article Meta Tags -->
+      <div class="article-meta-row">
+        <span class="badge-style">{{ fashion()?.style }}</span>
+        <span class="badge-idf">IdF: #{{ fashion()?.IdF }}</span>
+        <span class="meta-date">NGÀY ĐĂNG: {{ fashion()?.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+        <span class="meta-objectid">_ID: {{ fashion()?._id }}</span>
+      </div>
+
+      <!-- SEO Canonical Slug Banner -->
+      <div class="canonical-banner">
+        <span class="canonical-label">CANONICAL SEO SLUG:</span>
+        <strong class="canonical-slug">/fashion-slug/{{ fashion()?.getSlug() }}</strong>
+      </div>
+
+      <!-- Article Title -->
+      <h1 class="article-heading">{{ fashion()?.fashion_subject }}</h1>
+
+      <!-- Hero Thumbnail -->
+      @if (fashion()?.fashion_image) {
+        <div class="article-hero">
+          <img [src]="fashion()?.getBase64String()" [alt]="fashion()?.fashion_subject" class="hero-image" />
+        </div>
+      }
+
+      <!-- WYSIWYG Content Body -->
+      <div class="article-body">
+        <h3 class="body-title">NỘI DUNG CHI TIẾT BỘ SƯU TẬP:</h3>
+        <div class="rich-content" [innerHTML]="fashion()?.fashion_detail"></div>
+      </div>
+
+      <!-- Bottom Actions -->
+      <div class="article-footer-actions">
+        <button (click)="goBackToList()" class="btn-footer-back">
+          &larr; VỀ DANH SÁCH SLUG FASHION
+        </button>
+        <a [routerLink]="['/fashion-update']" [queryParams]="{ id: fashion()?._id }" class="btn-footer-edit">
+          CHỈNH SỬA BẢN GHI NÀY
+        </a>
+      </div>
+    </article>
+  }
+</div>

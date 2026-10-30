@@ -1,0 +1,138 @@
+<div class="fashion-slug-page">
+  <!-- Editorial Header -->
+  <header class="slug-masthead">
+    <div class="masthead-pre">
+      <span class="edition-tag">SEO ROUTING &bull; SLUG ARCHITECTURE SYSTEM</span>
+    </div>
+    <h1 class="masthead-title">SLUG FASHION COLLECTIONS</h1>
+    <p class="masthead-sub">
+      Quản lý danh sách thời trang với cột <strong>IdF số nguyên duy nhất</strong>. 
+      Tự động khởi tạo và phân tích <strong>Slug SEO</strong> (<code>ten-san-pham-p&#123;IdF&#125;</code>) 
+      để điều hướng xem chi tiết tối ưu hóa công cụ tìm kiếm.
+    </p>
+  </header>
+
+  <!-- Notification -->
+  @if (errMessage()) {
+    <div class="alert alert-danger">
+      <span>⚠ {{ errMessage() }}</span>
+    </div>
+  }
+
+  <!-- Filter & Search Bar -->
+  <div class="toolbar-card">
+    <div class="toolbar-left">
+      <label for="styleSelect"><strong>LỌC THEO PHONG CÁCH:</strong></label>
+      <select 
+        id="styleSelect" 
+        [value]="selectedStyle()" 
+        (change)="selectedStyle.set($any($event.target).value)" 
+        class="form-select">
+        <option value="ALL">-- TẤT CẢ PHONG CÁCH (ALL) --</option>
+        @for (st of styles(); track st) {
+          <option [value]="st">{{ st }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="toolbar-right">
+      <input 
+        type="text" 
+        placeholder="TÌM THEO TÊN, STYLE, SLUG HOẶC IDF..." 
+        [value]="searchTerm()" 
+        (input)="searchTerm.set($any($event.target).value)" 
+        class="search-input" />
+      <span class="count-badge">
+        {{ filteredFashions().length }} SẢN PHẨM
+      </span>
+    </div>
+  </div>
+
+  <!-- Main Fashion Slug Table -->
+  <div class="table-container">
+    @if (isLoading()) {
+      <div class="loading-box">
+        <div class="spinner"></div>
+        <p>ĐANG TẢI DỮ LIỆU FASHION SLUG...</p>
+      </div>
+    } @else if (filteredFashions().length === 0) {
+      <div class="empty-box">
+        <p>KHÔNG TÌM THẤY SẢN PHẨM PHÙ HỢP VỚI BỘ LỌC HIỆN TẠI.</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="editorial-table">
+          <thead>
+            <tr>
+              <th style="width: 80px; text-align: center;">CỘT IDF</th>
+              <th style="width: 90px; text-align: center;">THUMBNAIL</th>
+              <th>TIÊU ĐỀ FASHION (SUBJECT)</th>
+              <th style="width: 140px;">STYLE</th>
+              <th>SLUG ĐƯỢC TẠO (SEO URL)</th>
+              <th style="width: 120px;">NGÀY TẠO</th>
+              <th style="width: 220px; text-align: center;">CHI TIẾT ROUTING</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of filteredFashions(); track f._id) {
+              <tr>
+                <!-- Cột IdF kiểu số không trùng nhau -->
+                <td style="text-align: center;">
+                  <span class="idf-chip">#{{ f.IdF }}</span>
+                </td>
+
+                <!-- Thumbnail -->
+                <td style="text-align: center;">
+                  @if (f.fashion_image) {
+                    <img [src]="f.getBase64String()" [alt]="f.fashion_subject" class="table-thumb" />
+                  } @else {
+                    <div class="no-thumb">NO IMAGE</div>
+                  }
+                </td>
+
+                <!-- Tiêu đề -->
+                <td class="col-subject">
+                  <strong class="subject-title">{{ f.fashion_subject }}</strong>
+                  <div class="object-id-sub">MongoDB _id: {{ f._id }}</div>
+                </td>
+
+                <!-- Style -->
+                <td>
+                  <span class="style-badge">{{ f.style }}</span>
+                </td>
+
+                <!-- Cột Slug được tạo -->
+                <td class="col-slug">
+                  <div class="slug-card">
+                    <span class="slug-prefix">/fashion-slug/</span>
+                    <strong class="slug-text">{{ f.getSlug() }}</strong>
+                  </div>
+                  <a (click)="viewDetailSlug(f)" class="slug-link-action" title="Nhấp vào để phân tích và xem chi tiết theo Slug">
+                    🔗 Xem chi tiết theo Slug &rarr;
+                  </a>
+                </td>
+
+                <!-- Ngày tạo -->
+                <td class="col-date">
+                  {{ f.created_at | date:'dd/MM/yyyy' }}
+                </td>
+
+                <!-- Actions -->
+                <td style="text-align: center;">
+                  <div class="action-buttons">
+                    <button (click)="viewDetailSlug(f)" class="btn-action btn-slug" title="Điều hướng bằng Slug SEO">
+                      XEM THEO SLUG
+                    </button>
+                    <button (click)="viewDetailByIdF(f)" class="btn-action btn-idf" title="Điều hướng bằng IdF số">
+                      XEM IDF #{{ f.IdF }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

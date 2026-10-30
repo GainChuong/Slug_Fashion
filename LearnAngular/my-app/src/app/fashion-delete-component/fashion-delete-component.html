@@ -1,0 +1,49 @@
+<div class="fashion-delete-container">
+  <div class="delete-header">
+    <a routerLink="/fashion-list" class="btn-back">← Quay lại danh sách chính</a>
+    <h2>Quản Trị Xóa Fashion</h2>
+    <p class="subtitle">Thực hiện xóa các bản ghi thời trang (yêu cầu xác nhận hộp thoại confirm trước khi xóa)</p>
+  </div>
+
+  @if (errMessage()) {
+    <div class="alert alert-danger">
+      <span>⚠ {{ errMessage() }}</span>
+    </div>
+  }
+
+  <div class="table-card">
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th style="width: 80px;">Thumbnail</th>
+          <th>Fashion Subject</th>
+          <th style="width: 120px;">Style</th>
+          <th>Fashion Detail</th>
+          <th style="width: 120px; text-align: center;">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (fashion of fashions(); track fashion._id) {
+          <tr>
+            <td>
+              <img [src]="fashion.getBase64String()" width="60" height="60" class="table-img" [alt]="fashion.fashion_subject" />
+            </td>
+            <td>
+              <strong>{{ fashion.fashion_subject }}</strong>
+              <div style="font-size: 11px; color: #94a3b8; font-family: monospace;">ID: {{ fashion._id }}</div>
+            </td>
+            <td>
+              <span class="style-tag">{{ fashion.style }}</span>
+            </td>
+            <td>
+              <div style="max-height: 48px; overflow: hidden; font-size: 13px; color: #475569;" [innerHTML]="fashion.fashion_detail"></div>
+            </td>
+            <td style="text-align: center;">
+              <button (click)="deleteFashion(fashion._id)" class="btn btn-danger">Xóa</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,809 @@
+/* ==========================================================================
+   VINTAGE ATELIER THEME - FASHION SEARCH WITH JACCARD SIMILARITY
+   Cảm hứng: Cửa hàng thời trang cổ điển Paris & London thế kỷ 20
+   Màu sắc chủ đạo: Giấy da cổ (Parchment/Ivory), Vàng đồng cổ (Antique Brass), 
+   Xanh mực đen (Deep Charcoal), Gỗ sồi ấm (Warm Chestnut).
+   ========================================================================== */
+
+:host {
+  display: block;
+  --vintage-bg: #f9f6f0;              /* Nền giấy da cổ điển */
+  --vintage-surface: #fffdf9;         /* Nền card trắng ngà */
+  --vintage-surface-subtle: #f4eee2;  /* Nền khối con */
+  --vintage-border: #d8cdbe;          /* Viền xám da bò */
+  --vintage-border-dark: #8c7b6c;     /* Viền nâu sẫm */
+  --vintage-ink: #2b2520;             /* Chữ đen mực cổ */
+  --vintage-ink-muted: #6e6259;       /* Chữ ghi trầm */
+  --vintage-gold: #b38740;            /* Màu đồng vàng cổ */
+  --vintage-gold-hover: #966f2f;
+  --vintage-burgundy: #7a2638;        /* Đỏ vang cổ */
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.vintage-search-page {
+  max-width: 1360px;
+  margin: 32px auto 60px auto;
+  padding: 0 24px;
+  font-family: var(--font-body);
+  color: var(--vintage-ink);
+  background-color: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   MASTHEAD / TIÊU ĐỀ PHONG CÁCH ATELIER
+   -------------------------------------------------------------------------- */
+.vintage-masthead {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 36px 24px 28px 24px;
+  background: radial-gradient(ellipse at center, #ffffff 0%, #fbf8f2 100%);
+  border: 2px solid var(--vintage-gold);
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(74, 52, 33, 0.08), inset 0 0 40px rgba(179, 135, 64, 0.06);
+  position: relative;
+}
+
+.masthead-ornament-top,
+.masthead-ornament-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--vintage-gold);
+  font-size: 1rem;
+}
+
+.ornament-line {
+  display: inline-block;
+  width: 90px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--vintage-gold), transparent);
+}
+
+.brand-tag {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 3.5px;
+  color: var(--vintage-gold);
+  text-transform: uppercase;
+  margin: 12px 0 6px 0;
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 2.35rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--vintage-ink);
+  margin: 0 0 10px 0;
+  line-height: 1.25;
+}
+
+.brand-subtitle {
+  font-size: 0.96rem;
+  color: var(--vintage-ink-muted);
+  max-width: 720px;
+  margin: 0 auto 12px auto;
+  line-height: 1.6;
+}
+
+.brand-subtitle em {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--vintage-burgundy);
+  font-weight: 600;
+}
+
+/* Thông báo lỗi */
+.vintage-error-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background-color: #fdf2f2;
+  border: 1px solid #e8b4b4;
+  border-left: 5px solid #a83232;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  color: #782626;
+  font-size: 0.92rem;
+}
+
+.error-seal {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #a83232;
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.error-body {
+  flex: 1;
+}
+
+.btn-vintage-retry {
+  background: transparent;
+  border: 1px solid #a83232;
+  color: #a83232;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-vintage-retry:hover {
+  background: #a83232;
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   VINTAGE CARDS & KHUNG TÌM KIẾM
+   -------------------------------------------------------------------------- */
+.vintage-card {
+  background: var(--vintage-surface);
+  border: 1px solid var(--vintage-border);
+  border-radius: 8px;
+  padding: 32px 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(58, 46, 36, 0.05);
+  position: relative;
+}
+
+.card-ribbon {
+  display: inline-block;
+  background: var(--vintage-ink);
+  color: #f6eedb;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 3px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  border-left: 3px solid var(--vintage-gold);
+}
+
+.search-form-layout {
+  display: grid;
+  grid-template-columns: 2.2fr 1.6fr 1.1fr;
+  gap: 22px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 960px) {
+  .search-form-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vintage-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--vintage-ink);
+}
+
+.vintage-label-hint {
+  font-size: 0.74rem;
+  font-weight: 400;
+  text-transform: none;
+  color: var(--vintage-ink-muted);
+}
+
+.vintage-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 1.15rem;
+  color: var(--vintage-gold);
+  pointer-events: none;
+}
+
+.vintage-input,
+.vintage-select {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  font-family: var(--font-body);
+  font-size: 0.96rem;
+  background-color: #faf7f2;
+  border: 1.5px solid var(--vintage-border);
+  border-radius: 6px;
+  color: var(--vintage-ink);
+  outline: none;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+.vintage-select {
+  padding-left: 14px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238c7b6c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  appearance: none;
+}
+
+.vintage-input:focus,
+.vintage-select:focus {
+  background-color: #ffffff;
+  border-color: var(--vintage-gold);
+  box-shadow: 0 0 0 3px rgba(179, 135, 64, 0.15);
+}
+
+.clear-input-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--vintage-ink-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.clear-input-btn:hover {
+  color: var(--vintage-ink);
+}
+
+/* Segmented Control cổ điển */
+.vintage-segmented-control {
+  display: flex;
+  background: var(--vintage-surface-subtle);
+  border: 1px solid var(--vintage-border);
+  padding: 4px;
+  border-radius: 6px;
+  gap: 6px;
+}
+
+.segment-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--vintage-ink-muted);
+  transition: all 0.2s ease;
+  user-select: none;
+  margin: 0;
+}
+
+.segment-option input[type="radio"] {
+  display: none;
+}
+
+.segment-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--vintage-border-dark);
+  display: inline-block;
+  transition: all 0.2s;
+}
+
+.segment-option.selected {
+  background: #ffffff;
+  color: var(--vintage-ink);
+  box-shadow: 0 2px 6px rgba(43, 37, 32, 0.08);
+}
+
+.segment-option.selected .segment-indicator {
+  background: var(--vintage-gold);
+  border-color: var(--vintage-gold);
+}
+
+/* Hàng hành động */
+.console-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--vintage-border);
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-vintage-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #2b2520 0%, #1e1915 100%);
+  color: #f7eedb;
+  border: 1px solid var(--vintage-gold);
+  padding: 12px 26px;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.94rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(43, 37, 32, 0.2);
+  transition: all 0.25s ease;
+}
+
+.btn-vintage-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3d342d 0%, #2b2520 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(43, 37, 32, 0.3);
+}
+
+.btn-vintage-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-arrow {
+  color: var(--vintage-gold);
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+}
+
+.btn-vintage-primary:hover:not(:disabled) .btn-arrow {
+  transform: translateX(4px);
+}
+
+.btn-vintage-secondary {
+  background: transparent;
+  border: 1.5px solid var(--vintage-border);
+  color: var(--vintage-ink-muted);
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-vintage-secondary:hover:not(:disabled) {
+  background: var(--vintage-surface-subtle);
+  color: var(--vintage-ink);
+  border-color: var(--vintage-border-dark);
+}
+
+.database-counter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  color: var(--vintage-ink-muted);
+}
+
+.counter-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+}
+
+/* Thanh quy ước màu Jaccard (Legend) */
+.vintage-legend-plate {
+  margin-top: 24px;
+  padding: 14px 18px;
+  background: var(--vintage-surface-subtle);
+  border: 1px solid var(--vintage-border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 0.85rem;
+}
+
+.legend-plate-heading {
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--vintage-ink);
+  letter-spacing: 0.3px;
+}
+
+.legend-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  font-size: 0.82rem;
+}
+
+.chip-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.chip-score {
+  font-weight: 700;
+}
+
+/* Quy ước chip */
+.chip-pink {
+  background-color: #f7d6e0;
+  border-color: #e8a7b8;
+  color: #6d1c31;
+}
+.chip-pink .chip-swatch {
+  background-color: #d85c7a;
+}
+
+.chip-yellow {
+  background-color: #faecc9;
+  border-color: #e5cb85;
+  color: #634a07;
+}
+.chip-yellow .chip-swatch {
+  background-color: #d6a936;
+}
+
+.chip-gray {
+  background-color: #ebe7e0;
+  border-color: #d3ccc0;
+  color: #423d37;
+}
+.chip-gray .chip-swatch {
+  background-color: #9c9388;
+}
+
+/* --------------------------------------------------------------------------
+   PHẦN BẢNG KẾT QUẢ TÌM KIẾM
+   -------------------------------------------------------------------------- */
+.results-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1.5px solid var(--vintage-gold);
+}
+
+.vintage-section-title {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--vintage-ink);
+  margin: 0;
+  display: inline-block;
+}
+
+.results-badge {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--vintage-ink-muted);
+  margin-left: 12px;
+}
+
+.vintage-stats-cluster {
+  display: flex;
+  gap: 8px;
+}
+
+.stat-pill {
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.stat-pink {
+  background-color: #fce4ec;
+  color: #880e4f;
+}
+.stat-yellow {
+  background-color: #fff8e1;
+  color: #f57f17;
+}
+.stat-gray {
+  background-color: #eceff1;
+  color: #455a64;
+}
+
+/* Bảng hiển thị phong cách cổ điển */
+.vintage-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--vintage-border);
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.02);
+}
+
+.vintage-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.vintage-table thead th {
+  background: #2b2520;
+  color: #f6eedb;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.86rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 14px 16px;
+  border-bottom: 2px solid var(--vintage-gold);
+  white-space: nowrap;
+}
+
+.vintage-table tbody td {
+  padding: 16px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.cell-center {
+  text-align: center;
+}
+
+/* ==========================================================================
+   YÊU CẦU ĐỀ BÀI: TÔ MÀU NỀN THEO NGƯỠNG JACCARD SIMILARITY (SẮP XẾP GIẢM DẦN)
+   [0.75 -> 1.0] : Tô nền HỒNG (Vintage Rose / Blush)
+   [0.5 -> 0.75) : Tô nền VÀNG (Vintage Warm Gold / Champagne)
+   < 0.5         : Tô nền XÁM (Parchment Slate / Antique Gray)
+   ========================================================================== */
+
+/* 1. Mức [0.75 -> 1.0]: Nền hồng */
+.vintage-table tbody tr.row-pink {
+  background-color: #fae1e8 !important; /* Soft Vintage Blush */
+  color: #581628 !important;
+}
+.vintage-table tbody tr.row-pink:hover {
+  background-color: #f5d1dc !important;
+}
+.vintage-table tbody tr.row-pink .vintage-meter-fill {
+  background: #c2385c;
+}
+.vintage-table tbody tr.row-pink .jaccard-value {
+  color: #831843;
+}
+
+/* 2. Mức [0.5 -> 0.75): Nền vàng */
+.vintage-table tbody tr.row-yellow {
+  background-color: #fdf2d0 !important; /* Vintage Warm Champagne */
+  color: #563d03 !important;
+}
+.vintage-table tbody tr.row-yellow:hover {
+  background-color: #fbebbd !important;
+}
+.vintage-table tbody tr.row-yellow .vintage-meter-fill {
+  background: #c49618;
+}
+.vintage-table tbody tr.row-yellow .jaccard-value {
+  color: #78350f;
+}
+
+/* 3. Mức < 0.5: Nền xám */
+.vintage-table tbody tr.row-gray {
+  background-color: #ece7de !important; /* Vintage Parchment Gray */
+  color: #38342f !important;
+}
+.vintage-table tbody tr.row-gray:hover {
+  background-color: #e2dbd0 !important;
+}
+.vintage-table tbody tr.row-gray .vintage-meter-fill {
+  background: #7d756b;
+}
+.vintage-table tbody tr.row-gray .jaccard-value {
+  color: #475569;
+}
+
+/* Cột index */
+.index-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  opacity: 0.8;
+}
+
+/* Jaccard Meter Component */
+.jaccard-meter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.jaccard-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.vintage-meter-track {
+  width: 90px;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.vintage-meter-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.jaccard-pct {
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  opacity: 0.85;
+}
+
+/* Khung ảnh phong cách Vintage Polaroid/Portrait */
+.photo-frame {
+  display: inline-block;
+  padding: 4px;
+  background: #ffffff;
+  border: 1px solid var(--vintage-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.vintage-photo {
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block;
+}
+
+.photo-frame:hover {
+  transform: scale(1.18) rotate(1deg);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  z-index: 5;
+  position: relative;
+}
+
+.photo-placeholder {
+  width: 76px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0ece3;
+  color: var(--vintage-ink-muted);
+  font-size: 0.72rem;
+  text-align: center;
+  padding: 4px;
+}
+
+/* Style Tag */
+.vintage-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Subject & Detail */
+.subject-headline {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0;
+  color: inherit;
+}
+
+.detail-excerpt {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: inherit;
+  opacity: 0.92;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.archive-id {
+  font-family: monospace;
+  font-size: 0.78rem;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 3px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Empty states */
+.vintage-empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--vintage-ink-muted);
+}
+
+.vintage-stamp {
+  display: inline-block;
+  border: 2px dashed var(--vintage-gold);
+  color: var(--vintage-gold);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: 0.88rem;
+  padding: 6px 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.vintage-hourglass {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.state-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--vintage-ink);
+  margin: 0 0 8px 0;
+}
+
+.state-hint {
+  font-size: 0.92rem;
+  margin: 0 auto;
+  max-width: 500px;
+  line-height: 1.5;
+}

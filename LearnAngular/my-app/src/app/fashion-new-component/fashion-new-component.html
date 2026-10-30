@@ -1,0 +1,122 @@
+<div class="form-container">
+  <div class="form-header">
+    <div class="nav-back">
+      <a routerLink="/fashion-list" class="btn-back">← Quay lại danh sách</a>
+    </div>
+    <h2>Thêm Mới Sản Phẩm Fashion</h2>
+    <p class="subtitle">Nhập thông tin sản phẩm và soạn thảo chi tiết bằng công cụ WYSIWYG</p>
+  </div>
+
+  @if (errMessage) {
+    <div class="alert alert-danger">
+      <span>⚠ {{ errMessage }}</span>
+    </div>
+  }
+
+  <div class="card form-card">
+    <div class="form-grid">
+      <!-- IdF (Số không trùng nhau) -->
+      <div class="form-group">
+        <label for="idfInput"><strong>Mã số Fashion (IdF - Tùy chọn):</strong></label>
+        <input 
+          type="number" 
+          id="idfInput" 
+          [(ngModel)]="fashion.IdF" 
+          placeholder="Để trống hệ thống sẽ tự sinh số không trùng nhau..." 
+          class="form-control" />
+      </div>
+
+      <!-- Style -->
+      <div class="form-group">
+        <label for="styleInput"><strong>Phong cách (Style):</strong> <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="styleInput" 
+          list="styleList" 
+          [(ngModel)]="fashion.style" 
+          placeholder="Ví dụ: STREET STYLE, TRENDS, VINTAGE..." 
+          class="form-control" />
+        <datalist id="styleList">
+          @for (s of styles; track s) {
+            <option [value]="s"></option>
+          }
+        </datalist>
+      </div>
+
+      <!-- Subject -->
+      <div class="form-group">
+        <label for="subjectInput"><strong>Tiêu đề Fashion (Subject):</strong> <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="subjectInput" 
+          [(ngModel)]="fashion.fashion_subject" 
+          placeholder="Nhập tiêu đề hoặc tên bộ sưu tập thời trang..." 
+          class="form-control" />
+      </div>
+
+      <!-- Thumbnail Image -->
+      <div class="form-group full-width">
+        <label><strong>Hình ảnh đại diện (Thumbnail):</strong></label>
+        <div class="upload-box">
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" id="fileUpload" class="file-input" />
+          <label for="fileUpload" class="upload-label">
+            <span class="upload-icon">📁</span>
+            <span>Chọn ảnh từ máy tính (PNG, JPG, WebP)</span>
+          </label>
+          @if (imagePreview) {
+            <div class="preview-box">
+              <img [src]="imagePreview" alt="Preview Thumbnail" class="preview-img" />
+              <span class="preview-tag">Ảnh đã chọn</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- WYSIWYG Editor for Detail -->
+      <div class="form-group full-width">
+        <label><strong>Chi tiết Fashion (WYSIWYG Editor):</strong></label>
+        <div class="wysiwyg-container">
+          <!-- Toolbar -->
+          <div class="wysiwyg-toolbar">
+            <button type="button" (click)="execCmd('bold')" title="In đậm (Bold)"><b>B</b></button>
+            <button type="button" (click)="execCmd('italic')" title="In nghiêng (Italic)"><i>I</i></button>
+            <button type="button" (click)="execCmd('underline')" title="Gạch chân (Underline)"><u>U</u></button>
+            <span class="divider"></span>
+            <button type="button" (click)="execCmd('justifyLeft')" title="Căn trái">⇤</button>
+            <button type="button" (click)="execCmd('justifyCenter')" title="Căn giữa">≡</button>
+            <button type="button" (click)="execCmd('justifyRight')" title="Căn phải">⇥</button>
+            <span class="divider"></span>
+            <button type="button" (click)="execCmd('insertUnorderedList')" title="Danh sách chấm">• List</button>
+            <button type="button" (click)="execCmd('insertOrderedList')" title="Danh sách số">1. List</button>
+            <span class="divider"></span>
+            <button type="button" (click)="execCmd('formatBlock', '<h3>')" title="Tiêu đề H3">H3</button>
+            <button type="button" (click)="execCmd('formatBlock', '<p>')" title="Đoạn văn">P</button>
+          </div>
+          <!-- Editable Area -->
+          <div 
+            class="wysiwyg-content" 
+            contenteditable="true" 
+            (input)="onDetailInput($event)"
+            placeholder="Nhập nội dung mô tả chi tiết bài viết thời trang...">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit buttons -->
+    <div class="form-actions">
+      <button 
+        type="button" 
+        (click)="postFashion()" 
+        [disabled]="isSubmitting" 
+        class="btn btn-primary btn-lg">
+        @if (isSubmitting) {
+          Đang lưu dữ liệu...
+        } @else {
+          ✔ Hoàn tất & Lưu Fashion
+        }
+      </button>
+      <a routerLink="/fashion-list" class="btn btn-secondary btn-lg">Hủy bỏ</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+
+<div>
+    Min price:<input type="number" [(ngModel)]="minPrice" />
+    Max price:<input type="number" [(ngModel)]="maxPrice" />
+    <button (click)="doFilterByPrice()">Filter</button>
+</div>
+<ol>
+    <li *ngFor="let product of products">
+        {{product.name}} - VNĐ {{product.price}}
+        <br>
+        <img [src]="product.image" [alt]="product.name"
+        width="100" height="100"/>
+    </li>
+</ol>

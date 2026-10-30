@@ -1,0 +1,79 @@
+<div class="detail-container">
+  <div class="detail-header">
+    <div class="nav-back">
+      <a routerLink="/fashion-list" class="btn-back">← Quay lại danh sách Admin</a>
+      <span class="nav-sep">|</span>
+      <a routerLink="/fashion-magazine" class="btn-back">★ Xem trang Magazine</a>
+    </div>
+    <h2>Chi Tiết Sản Phẩm Fashion</h2>
+    <p class="subtitle">Tra cứu qua Slug SEO hoặc ObjectId/IdF. Hệ thống tự động phân tích Slug để trích xuất Fashion chính xác.</p>
+  </div>
+
+  <!-- Search / Slug input Bar -->
+  <div class="search-box-card">
+    <label for="fIdInput"><strong>Nhập Slug hoặc IdF / ObjectId:</strong></label>
+    <div class="search-input-group">
+      <input 
+        type="text" 
+        id="fIdInput" 
+        [(ngModel)]="searchIdInput" 
+        placeholder="Ví dụ Slug: ao-khoac-da-p1 hoặc nhập IdF: 1 hoặc ObjectId MongoDB..." 
+        class="form-control" />
+      <button (click)="resolveAndLoadFashion(searchIdInput)" class="btn btn-primary">Phân tích & Tìm</button>
+    </div>
+  </div>
+
+  @if (errMessage()) {
+    <div class="alert alert-danger">
+      <span>⚠ {{ errMessage() }}</span>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Hệ thống đang phân tích Slug và nạp Fashion...</p>
+    </div>
+  }
+
+  @if (fashion() != null) {
+    <div class="fashion-detail-article">
+      <!-- Header meta tags -->
+      <div class="article-meta">
+        <span class="style-badge">{{ fashion()?.style }}</span>
+        <span class="idf-badge">IdF: #{{ fashion()?.IdF }}</span>
+        <span class="created-date">Ngày đăng: {{ fashion()?.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+        <span class="object-id">_id: {{ fashion()?._id }}</span>
+      </div>
+
+      <!-- SEO Slug Bar -->
+      <div class="slug-info-bar">
+        <span class="slug-label">SEO URL SLUG:</span>
+        <code class="slug-code">/fashion-detail/{{ currentSlug() }}</code>
+      </div>
+
+      <h1 class="article-title">{{ fashion()?.fashion_subject }}</h1>
+
+      <!-- Main Thumbnail -->
+      @if (fashion()?.fashion_image) {
+        <div class="article-hero-image">
+          <img [src]="fashion()?.getBase64String()" [alt]="fashion()?.fashion_subject" />
+        </div>
+      }
+
+      <!-- WYSIWYG Rich Detail Content -->
+      <div class="article-body">
+        <h3 class="body-title">Nội dung chi tiết thời trang:</h3>
+        <div class="rich-html-content" [innerHTML]="fashion()?.fashion_detail"></div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="detail-actions">
+        <a [routerLink]="['/fashion-update']" [queryParams]="{ id: fashion()?._id }" class="btn btn-warning">
+          Chỉnh sửa Fashion
+        </a>
+        <a routerLink="/fashion-list" class="btn btn-secondary">Về danh sách</a>
+      </div>
+    </div>
+  }
+</div>

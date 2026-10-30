@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+.form-container {
+  max-width: 960px;
+  margin: 32px auto;
+  padding: 0 24px;
+  font-family: 'Montserrat', sans-serif;
+  color: #121212;
+  background-color: #faf9f6;
+  min-height: 100vh;
+}
+
+.btn-back {
+  display: inline-block;
+  color: #121212;
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.btn-back:hover {
+  opacity: 0.6;
+}
+
+.form-header {
+  border-bottom: 2px solid #121212;
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+}
+
+.form-header h2 {
+  font-family: 'Playfair Display', serif;
+  margin: 8px 0 6px 0;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #000;
+}
+.subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.form-card {
+  background: #ffffff;
+  border: 1px solid #121212;
+  box-shadow: 12px 12px 0px #121212;
+  padding: 40px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.form-group label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: #121212;
+}
+.required {
+  color: #b91c1c;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #121212;
+  font-size: 13px;
+  letter-spacing: 1px;
+  font-family: inherit;
+  color: #121212;
+  box-sizing: border-box;
+  background: #fff;
+}
+.form-control:focus {
+  background: #fafafa;
+  outline: none;
+}
+
+/* Upload */
+.upload-box {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.file-input {
+  display: none;
+}
+.upload-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: #f4f4f4;
+  border: 1px dashed #121212;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #121212;
+}
+.upload-label:hover {
+  background: #121212;
+  color: #fff;
+}
+.preview-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.preview-img {
+  width: 80px;
+  height: 95px;
+  object-fit: cover;
+  border: 1px solid #121212;
+}
+.preview-tag {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: #15803d;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* WYSIWYG Editor */
+.wysiwyg-container {
+  border: 1px solid #121212;
+}
+.wysiwyg-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f4f4f4;
+  border-bottom: 1px solid #121212;
+}
+.wysiwyg-toolbar button {
+  background: #ffffff;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #121212;
+}
+.wysiwyg-toolbar button:hover {
+  background: #121212;
+  color: #fff;
+  border-color: #121212;
+}
+.wysiwyg-toolbar .divider {
+  width: 1px;
+  height: 20px;
+  background: #ccc;
+  margin: 0 4px;
+}
+.wysiwyg-content {
+  min-height: 220px;
+  padding: 16px;
+  outline: none;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #333;
+  background: #ffffff;
+}
+
+/* Actions */
+.form-actions {
+  margin-top: 32px;
+  display: flex;
+  gap: 16px;
+}
+.btn-lg {
+  padding: 14px 32px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid #121212;
+  text-decoration: none;
+}
+.btn-primary {
+  background: #121212;
+  color: #ffffff;
+}
+.btn-primary:hover {
+  background: #ffffff;
+  color: #121212;
+}
+.btn-secondary {
+  background: #f4f4f4;
+  color: #121212;
+}
+.btn-secondary:hover {
+  background: #121212;
+  color: #ffffff;
+}
+
+.alert-danger {
+  padding: 14px 20px;
+  background: #ffffff;
+  color: #b91c1c;
+  border-left: 4px solid #b91c1c;
+  margin-bottom: 24px;
+  font-size: 13px;
+  letter-spacing: 1px;
+}

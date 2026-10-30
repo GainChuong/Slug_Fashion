@@ -1,0 +1,5 @@
+[
+    { "id": 1, "name": "Product 1", "price": 10, "image": "https://bizweb.dktcdn.net/thumb/1024x1024/100/459/953/products/airpods-max-2024-3.jpg?v=1726488178540" },
+    { "id": 2, "name": "Product 2", "price": 20, "image": "https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/4547/323008/ban-phim-bluetooth-logitech-k380s-hong-3-638620803301909154.jpg" },
+    { "id": 3, "name": "Product 3", "price": 30, "image": "https://cdn.tgdd.vn/Products/Images/86/308333/chuot-bluetooth-slient-dareu-lm115b-den-1.jpg" }
+]

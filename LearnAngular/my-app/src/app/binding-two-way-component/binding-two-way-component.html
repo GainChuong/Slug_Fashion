@@ -1,0 +1,46 @@
+<p>binding-two-way-component works!</p>
+<table>
+    <tr>
+        <td colspan="2">
+            Phương trình bậc 2
+        </td>
+    </tr>
+    <tr>
+        <td>
+            a:
+        </td>
+        <td>
+            <input type="text" [(ngModel)]="hsa">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            b:
+        </td>
+        <td>
+            <input type="text" [(ngModel)]="hsb">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            c:
+        </td>
+        <td>
+            <input type="text" [(ngModel)]="hsc">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Kết quả:
+        </td>
+        <td>
+            {{ketqua}}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <button (click)="giaipt2()">Giải</button>
+            <button>PT mới</button>
+        </td>
+    </tr>
+</table>

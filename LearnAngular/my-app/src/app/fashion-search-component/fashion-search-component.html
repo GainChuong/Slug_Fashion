@@ -1,0 +1,287 @@
+<div class="vintage-search-page">
+  <!-- VINTAGE LUXURY HEADER -->
+  <header class="vintage-masthead">
+    <div class="masthead-ornament-top">
+      <span class="ornament-line"></span>
+      <span class="ornament-diamond">❖</span>
+      <span class="ornament-line"></span>
+    </div>
+
+    <div class="masthead-brand">
+      <span class="brand-tag">ATELIER &amp; ARCHIVE &bull; EST. 1984</span>
+      <h1 class="brand-title">Fashion Heritage &amp; Discovery</h1>
+      <p class="brand-subtitle">
+        Khám phá bộ sưu tập thời trang cổ điển qua thuật toán phân tích văn bản <em>Jaccard Similarity Index</em>
+      </p>
+    </div>
+
+    <div class="masthead-ornament-bottom">
+      <span class="ornament-line"></span>
+      <span class="ornament-diamond">✦</span>
+      <span class="ornament-line"></span>
+    </div>
+  </header>
+
+  <!-- LỖI KẾT NỐI SERVER NẾU CÓ -->
+  @if (errMessage()) {
+    <div class="vintage-error-box" role="alert">
+      <div class="error-seal">!</div>
+      <div class="error-body">
+        <strong>Thông báo hệ thống:</strong>
+        <span>{{ errMessage() }}</span>
+      </div>
+      <button type="button" class="btn-vintage-retry" (click)="loadAllFashions()">Thử kết nối lại</button>
+    </div>
+  }
+
+  <!-- PHẦN TRÊN: FORM TÌM KIẾM THEO PHONG CÁCH VINTAGE ATELIER -->
+  <section class="vintage-card search-console">
+    <div class="card-ribbon">
+      <span class="ribbon-text">BỘ LỌC TÌM KIẾM</span>
+    </div>
+
+    <div class="search-form-layout">
+      <!-- Input từ khóa -->
+      <div class="form-field keyword-field">
+        <label for="vintageKeyword" class="vintage-label">
+          <span>Từ khóa tìm kiếm</span>
+          <span class="vintage-label-hint">Nhập chủ đề hoặc chất liệu / phong cách</span>
+        </label>
+        <div class="vintage-input-wrap">
+          <span class="input-icon">⚲</span>
+          <input
+            id="vintageKeyword"
+            type="text"
+            class="vintage-input"
+            [(ngModel)]="keyword"
+            (keyup.enter)="onSearch()"
+            placeholder="Ví dụ: Street Style, Paris, Coat, Velvet, Summer..."
+          />
+          @if (keyword) {
+            <button type="button" class="clear-input-btn" (click)="keyword = ''" title="Xóa từ khóa">&times;</button>
+          }
+        </div>
+      </div>
+
+      <!-- Chọn trường tìm kiếm (Subject hoặc Detail) -->
+      <div class="form-field scope-field">
+        <label class="vintage-label">Tra cứu theo trường</label>
+        <div class="vintage-segmented-control">
+          <label class="segment-option" [class.selected]="searchField === 'fashion_subject'">
+            <input
+              type="radio"
+              name="searchScope"
+              value="fashion_subject"
+              [(ngModel)]="searchField"
+            />
+            <span class="segment-indicator"></span>
+            <span class="segment-title">Tiêu đề (Subject)</span>
+          </label>
+          <label class="segment-option" [class.selected]="searchField === 'fashion_detail'">
+            <input
+              type="radio"
+              name="searchScope"
+              value="fashion_detail"
+              [(ngModel)]="searchField"
+            />
+            <span class="segment-indicator"></span>
+            <span class="segment-title">Chi tiết (Detail)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Chọn số lượng kết quả hiển thị -->
+      <div class="form-field limit-field">
+        <label for="vintageLimit" class="vintage-label">Số kết quả</label>
+        <div class="vintage-select-wrap">
+          <select id="vintageLimit" class="vintage-select" [(ngModel)]="limitOption">
+            <option [ngValue]="5">5 mẫu tiêu biểu</option>
+            <option [ngValue]="10">10 mẫu tiêu biểu</option>
+            <option [ngValue]="20">20 mẫu tiêu biểu</option>
+            <option [ngValue]="50">50 mẫu</option>
+            <option [ngValue]="-1">Tất cả mẫu lưu trữ</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thanh hành động & Thống kê lưu trữ -->
+    <div class="console-actions">
+      <div class="button-group">
+        <button
+          type="button"
+          class="btn-vintage-primary"
+          (click)="onSearch()"
+          [disabled]="isLoading() || !keyword.trim()"
+        >
+          <span class="btn-text">Tìm kiếm &amp; Tính Jaccard</span>
+          <span class="btn-arrow">&rarr;</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn-vintage-secondary"
+          (click)="onReset()"
+          [disabled]="!keyword && searchResults().length === 0"
+        >
+          Đặt lại
+        </button>
+      </div>
+
+      <div class="database-counter">
+        <span class="counter-dot"></span>
+        <span>Bộ sưu tập MongoDB: <strong>{{ allFashions().length }}</strong> mẫu thời trang</span>
+      </div>
+    </div>
+
+    <!-- Bảng màu quy ước phân loại Jaccard -->
+    <div class="vintage-legend-plate">
+      <span class="legend-plate-heading">Quy ước màu Jaccard Similarity:</span>
+      <div class="legend-chips">
+        <div class="legend-chip chip-pink">
+          <span class="chip-swatch"></span>
+          <span class="chip-score">[0.75 &rarr; 1.0]</span>
+          <span class="chip-desc">Nền hồng &bull; Rất khớp</span>
+        </div>
+        <div class="legend-chip chip-yellow">
+          <span class="chip-swatch"></span>
+          <span class="chip-score">[0.5 &rarr; 0.75)</span>
+          <span class="chip-desc">Nền vàng &bull; Tương đồng vừa</span>
+        </div>
+        <div class="legend-chip chip-gray">
+          <span class="chip-swatch"></span>
+          <span class="chip-score">&lt; 0.5</span>
+          <span class="chip-desc">Nền xám &bull; Ít tương đồng</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN DƯỚI: DANH SÁCH KẾT QUẢ TÌM THẤY -->
+  <section class="vintage-card results-console">
+    <div class="results-toolbar">
+      <div class="toolbar-title-box">
+        <h2 class="vintage-section-title">Danh Mục Thời Trang Khớp Lệnh</h2>
+        @if (hasSearched()) {
+          <span class="results-badge">{{ searchResults().length }} sản phẩm được xếp hạng</span>
+        }
+      </div>
+
+      @if (hasSearched() && searchResults().length > 0) {
+        <div class="vintage-stats-cluster">
+          <span class="stat-pill stat-pink">
+            Hồng: <strong>{{ getCountByRange(0.75, 1.0, true) }}</strong>
+          </span>
+          <span class="stat-pill stat-yellow">
+            Vàng: <strong>{{ getCountByRange(0.5, 0.75, false) }}</strong>
+          </span>
+          <span class="stat-pill stat-gray">
+            Xám: <strong>{{ getCountByRange(0, 0.5, false) }}</strong>
+          </span>
+        </div>
+      }
+    </div>
+
+    <!-- TRẠNG THÁI LOADING / CHƯA TÌM / RỖNG -->
+    @if (isLoading()) {
+      <div class="vintage-empty-state">
+        <div class="vintage-hourglass">⌛</div>
+        <p class="state-title">Đang truy xuất kho thời trang từ MongoDB...</p>
+        <p class="state-hint">Xin vui lòng đợi trong giây lát</p>
+      </div>
+    } @else if (!hasSearched()) {
+      <div class="vintage-empty-state">
+        <div class="vintage-stamp">✦ VINTAGE ARCHIVE ✦</div>
+        <p class="state-title">Chưa thực hiện tìm kiếm</p>
+        <p class="state-hint">
+          Hãy nhập từ khóa mô tả ở ô trên và bấm <strong>"Tìm kiếm &amp; Tính Jaccard"</strong> để xem bảng phân tích độ tương đồng.
+        </p>
+      </div>
+    } @else if (searchResults().length === 0) {
+      <div class="vintage-empty-state">
+        <div class="vintage-stamp">0 KẾT QUẢ</div>
+        <p class="state-title">Không tìm thấy sản phẩm nào</p>
+        <p class="state-hint">Thử đổi từ khóa khác hoặc chuyển sang trường tìm kiếm còn lại.</p>
+      </div>
+    } @else {
+      <!-- BẢNG HIỂN THỊ DỮ LIỆU FASHION THEO VINTAGE STYLE -->
+      <div class="vintage-table-container">
+        <table class="vintage-table">
+          <thead>
+            <tr>
+              <th class="col-idx">#</th>
+              <th class="col-jaccard">Jaccard Index</th>
+              <th class="col-img">Hình Ảnh</th>
+              <th class="col-style">Phong Cách</th>
+              <th class="col-subject">Chủ Đề (Subject)</th>
+              <th class="col-detail">Mô Tả Chi Tiết (Detail)</th>
+              <th class="col-id">Mã Lưu Trữ (Id)</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of searchResults(); track item.fashion._id; let i = $index) {
+              <tr [ngClass]="getRowHighlightClass(item.similarity)">
+                <!-- STT -->
+                <td class="col-idx cell-center">
+                  <span class="index-num">{{ i + 1 }}</span>
+                </td>
+
+                <!-- JACCARD SIMILARITY (SẮP XẾP GIẢM DẦN) -->
+                <td class="col-jaccard cell-center">
+                  <div class="jaccard-meter">
+                    <span class="jaccard-value">{{ item.similarity }}</span>
+                    <div class="vintage-meter-track">
+                      <div
+                        class="vintage-meter-fill"
+                        [style.width.%]="item.similarity * 100"
+                      ></div>
+                    </div>
+                    <span class="jaccard-pct">{{ (item.similarity * 100).toFixed(1) }}% khớp</span>
+                  </div>
+                </td>
+
+                <!-- IMAGE (BASE64 HOẶC PLACEHOLDER) -->
+                <td class="col-img cell-center">
+                  <div class="photo-frame">
+                    @if (item.fashion.fashion_image) {
+                      <img
+                        [src]="item.fashion.getBase64String()"
+                        [alt]="item.fashion.fashion_subject"
+                        class="vintage-photo"
+                        loading="lazy"
+                      />
+                    } @else {
+                      <div class="photo-placeholder">Không có ảnh</div>
+                    }
+                  </div>
+                </td>
+
+                <!-- STYLE -->
+                <td class="col-style">
+                  <span class="vintage-tag">{{ item.fashion.style || 'Cổ điển' }}</span>
+                </td>
+
+                <!-- FASHION SUBJECT -->
+                <td class="col-subject">
+                  <h3 class="subject-headline">{{ item.fashion.fashion_subject }}</h3>
+                </td>
+
+                <!-- FASHION DETAIL -->
+                <td class="col-detail">
+                  <p class="detail-excerpt">{{ item.fashion.fashion_detail }}</p>
+                </td>
+
+                <!-- ID -->
+                <td class="col-id">
+                  <span class="archive-id" title="{{ item.fashion._id }}">
+                    {{ item.fashion._id }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>

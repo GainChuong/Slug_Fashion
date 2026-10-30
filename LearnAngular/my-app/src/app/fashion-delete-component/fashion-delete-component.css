@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+.fashion-delete-container {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 0 24px;
+  font-family: 'Montserrat', sans-serif;
+  color: #121212;
+  background-color: #faf9f6;
+  min-height: 100vh;
+}
+
+.delete-header {
+  border-bottom: 2px solid #121212;
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+}
+
+.btn-back {
+  display: inline-block;
+  color: #121212;
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.btn-back:hover {
+  opacity: 0.6;
+}
+
+.delete-header h2 {
+  font-family: 'Playfair Display', serif;
+  margin: 8px 0 6px 0;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #b91c1c;
+}
+
+.subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.alert-danger {
+  padding: 14px 20px;
+  background: #ffffff;
+  color: #b91c1c;
+  border-left: 4px solid #b91c1c;
+  margin-bottom: 24px;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.table-card {
+  background: #ffffff;
+  border: 1px solid #121212;
+  box-shadow: 8px 8px 0px #121212;
+  overflow: hidden;
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.styled-table th {
+  background: #fafafa;
+  color: #121212;
+  font-weight: 700;
+  padding: 16px 18px;
+  border-bottom: 2px solid #121212;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+}
+
+.styled-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.table-img {
+  width: 72px;
+  height: 85px;
+  object-fit: cover;
+  border: 1px solid #121212;
+}
+
+.style-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #f4f4f4;
+  color: #121212;
+  border: 1px solid #ddd;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.btn-danger {
+  background: #ffffff;
+  color: #b91c1c;
+  border: 1px solid #b91c1c;
+  padding: 8px 18px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.btn-danger:hover {
+  background: #b91c1c;
+  color: #ffffff;
+}

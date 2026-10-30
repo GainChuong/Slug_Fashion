@@ -1,0 +1,128 @@
+<div class="fashion-admin-container">
+  <!-- Header Bar -->
+  <div class="admin-header">
+    <div class="header-titles">
+      <span class="badge">ADMIN FASHION SYSTEM</span>
+      <h2>Danh Sách Quản Trị Fashion</h2>
+      <p class="subtitle">Quản lý, tìm kiếm, lọc theo phong cách, thêm mới, sửa và xóa Fashion Data</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/fashion-new" class="btn btn-primary">
+        <i class="icon">+</i> Thêm Mới Fashion
+      </a>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  @if (successMessage()) {
+    <div class="alert alert-success">
+      <span>✔ {{ successMessage() }}</span>
+    </div>
+  }
+  @if (errMessage()) {
+    <div class="alert alert-danger">
+      <span>⚠ {{ errMessage() }}</span>
+    </div>
+  }
+
+  <!-- Filter ToolBar -->
+  <div class="filter-card">
+    <div class="filter-group">
+      <label for="styleFilter"><strong>Lọc theo Style:</strong></label>
+      <select 
+        id="styleFilter" 
+        [value]="selectedStyle()" 
+        (change)="onStyleFilterChange($any($event.target).value)" 
+        class="form-select">
+        <option value="">-- Tất cả Style --</option>
+        @for (st of styles(); track st) {
+          <option [value]="st">{{ st }}</option>
+        }
+      </select>
+    </div>
+    <div class="filter-info">
+      Tổng số: <strong>{{ fashions().length }}</strong> sản phẩm
+      @if (selectedStyle()) {
+        <span>(Đang lọc: <em>{{ selectedStyle() }}</em>)</span>
+      }
+    </div>
+  </div>
+
+  <!-- Main Table -->
+  <div class="table-card">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Đang tải dữ liệu thời trang...</p>
+      </div>
+    } @else if (fashions().length === 0) {
+      <div class="empty-state">
+        <p>Không có sản phẩm thời trang nào phù hợp.</p>
+        <a routerLink="/fashion-new" class="btn btn-outline">+ Thêm Fashion ngay</a>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th style="width: 70px; text-align: center;">IdF</th>
+              <th style="width: 80px;">Thumbnail</th>
+              <th>Tiêu đề (Subject) & Slug</th>
+              <th style="width: 130px;">Style</th>
+              <th>Chi tiết (Detail)</th>
+              <th style="width: 140px;">Ngày tạo</th>
+              <th style="width: 220px; text-align: center;">Thao tác (Actions)</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of fashions(); track f._id) {
+              <tr>
+                <td style="text-align: center;">
+                  <span class="idf-chip">#{{ f.IdF }}</span>
+                </td>
+                <td class="col-thumb">
+                  @if (f.fashion_image) {
+                    <img [src]="f.getBase64String()" [alt]="f.fashion_subject" class="table-img" />
+                  } @else {
+                    <div class="no-img">No Image</div>
+                  }
+                </td>
+                <td class="col-subject">
+                  <strong>{{ f.fashion_subject }}</strong>
+                  <div class="slug-link-wrap">
+                    <a (click)="viewDetailSlug(f)" class="slug-badge-link" title="Xem chi tiết theo Slug SEO">
+                      🔗 {{ f.getSlug() }}
+                    </a>
+                  </div>
+                  <div class="id-sub">_id: {{ f._id }}</div>
+                </td>
+                <td>
+                  <span class="style-tag">{{ f.style }}</span>
+                </td>
+                <td class="col-detail">
+                  <div class="detail-preview" [innerHTML]="f.fashion_detail"></div>
+                </td>
+                <td class="col-date">
+                  <span class="date-text">{{ f.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+                </td>
+                <td class="col-actions">
+                  <div class="btn-group">
+                    <button (click)="viewDetail(f._id)" class="btn btn-sm btn-info" title="Xem chi tiết">
+                      Chi tiết
+                    </button>
+                    <button (click)="editFashion(f._id)" class="btn btn-sm btn-warning" title="Chỉnh sửa">
+                      Sửa
+                    </button>
+                    <button (click)="deleteFashion(f._id, f.fashion_subject)" class="btn btn-sm btn-danger" title="Xóa">
+                      Xóa
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
